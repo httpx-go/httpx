@@ -1,6 +1,7 @@
 package httpx
 
 import (
+	"context"
 	"crypto/tls"
 	"io"
 	"mime/multipart"
@@ -155,6 +156,10 @@ type Request interface {
 	SetBody(body io.ReadCloser)
 	// SetTLS sets the connection state.
 	SetTLS(connectionState *tls.ConnectionState)
+	// Context returns the request context.
+	Context() context.Context
+	// WithContext returns a shallow copy of the request with its context changed to ctx.
+	WithContext(ctx context.Context) Request
 	// SetHttpRequest copies headers, body, etc. to this httpx.Request.
 	// Depending on the implementation, it may be re-set as an internal request.
 	// Update operations on this httpx.Request may affect specified request.

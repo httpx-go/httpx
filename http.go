@@ -1,6 +1,7 @@
 package httpx
 
 import (
+	"context"
 	"crypto/tls"
 	"io"
 	"mime/multipart"
@@ -366,6 +367,15 @@ func (r *httpRequest) SetBody(body io.ReadCloser) {
 
 func (r *httpRequest) SetTLS(connectionState *tls.ConnectionState) {
 	r.req.TLS = connectionState
+}
+
+func (r *httpRequest) Context() context.Context {
+	return r.req.Context()
+}
+
+func (r *httpRequest) WithContext(ctx context.Context) Request {
+	r.SetHttpRequest(r.req.WithContext(ctx))
+	return r
 }
 
 func (r *httpRequest) SetHttpRequest(hr *http.Request) {
