@@ -261,6 +261,9 @@ func (r *httpRequest) Header() Header {
 	if r.header == nil {
 		r.header = &httpHeader{}
 	}
+	if r.req.Header == nil {
+		r.req.Header = http.Header{}
+	}
 	r.header.Header = r.req.Header
 	return r.header
 }
@@ -421,7 +424,13 @@ var _ Response = (*httpResponse)(nil)
 
 func (r *httpResponse) Header() Header {
 	if r.header == nil {
-		r.header = &httpHeader{Header: r.w.Header()}
+		r.header = &httpHeader{}
+	}
+	if r.w != nil {
+		r.header.Header = r.w.Header()
+	}
+	if r.header.Header == nil {
+		r.header.Header = http.Header{}
 	}
 	return r.header
 }
