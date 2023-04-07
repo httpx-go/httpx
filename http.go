@@ -201,27 +201,27 @@ func (v *httpValues) Reset() {
 
 // httpHeader implements httpx.Header.
 type httpHeader struct {
-	*http.Header
+	http.Header
 }
 
 var _ Header = (*httpHeader)(nil)
 
 func (h *httpHeader) Each(fn func(name string, values []string)) {
-	for name, values := range *h.Header {
+	for name, values := range h.Header {
 		fn(name, values)
 	}
 }
 
 func (h *httpHeader) Set(name string, values ...string) {
-	(*h.Header)[name] = values
+	h.Header[name] = values
 }
 
 func (h *httpHeader) Delete(name string) {
-	delete(*h.Header, name)
+	delete(h.Header, name)
 }
 
 func (h *httpHeader) Has(name string) bool {
-	_, ok := (*h.Header)[name]
+	_, ok := (h.Header)[name]
 	return ok
 }
 
@@ -237,12 +237,12 @@ func (h *httpHeader) WriteTo(w io.Writer) error {
 }
 
 func (h *httpHeader) Len() int {
-	return len(*h.Header)
+	return len(h.Header)
 }
 
 func (h *httpHeader) Reset() {
-	for k := range *h.Header {
-		delete(*h.Header, k)
+	for k := range h.Header {
+		delete(h.Header, k)
 	}
 }
 
@@ -261,12 +261,12 @@ func (r *httpRequest) Header() Header {
 	if r.header == nil {
 		r.header = &httpHeader{}
 	}
-	r.header.Header = &r.req.Header
+	r.header.Header = r.req.Header
 	return r.header
 }
 
 func (r *httpRequest) Trailer() Header {
-	return &httpHeader{Header: &r.req.Trailer}
+	return &httpHeader{Header: r.req.Trailer}
 }
 
 func (r *httpRequest) Method() string {
@@ -421,8 +421,7 @@ var _ Response = (*httpResponse)(nil)
 
 func (r *httpResponse) Header() Header {
 	if r.header == nil {
-		header := r.w.Header()
-		r.header = &httpHeader{Header: &header}
+		r.header = &httpHeader{Header: r.w.Header()}
 	}
 	return r.header
 }
@@ -506,7 +505,7 @@ func ToHttpResponseWriter(w Response) http.ResponseWriter {
 // ToHttpHeader converts httpx.Header to http.Header.
 func ToHttpHeader(h Header) http.Header {
 	if hh, ok := h.(*httpHeader); ok {
-		return *hh.Header
+		return hh.Header
 	}
 	hh := http.Header{}
 	h.Each(func(name string, values []string) {
